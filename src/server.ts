@@ -92,6 +92,8 @@ server.post('/markets/:id/odds', async (request, reply) => {
   return market;
 });
 
+export { server };
+
 const start = async () => {
   const port = Number(process.env.PORT) || 3000;
   const host = process.env.HOST || '0.0.0.0';
@@ -104,4 +106,6 @@ const start = async () => {
   }
 };
 
-start();
+if (require.main === module) {
+  start();
+}
