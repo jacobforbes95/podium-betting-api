@@ -2,6 +2,8 @@
 import { createMarket, getMarket, filterMarkets, updateOdds } from './store/marketStore';
 import { validateCreateMarket, CreateMarketInput, validateUpdateOdds, UpdateOddsInput } from './validation/market';
 import { Sport, MarketStatus } from './models/market';
+import { on, off } from './events/eventBus';
+import { ODDS_CHANGED, OddsChangedEvent } from './events/marketEvents';
 
 const server = Fastify({
   logger: true
@@ -10,6 +12,25 @@ const server = Fastify({
 // Health endpoint
 server.get('/health', async () => {
   return { status: 'ok' };
+});
+
+// SSE endpoint for odds_changed events
+server.get('/events/odds', (request, reply) => {
+  reply.raw.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+  });
+
+  const handler = (event: OddsChangedEvent) => {
+    reply.raw.write(`data: ${JSON.stringify(event)}\n\n`);
+  };
+
+  on<OddsChangedEvent>(ODDS_CHANGED, handler);
+
+  request.raw.on('close', () => {
+    off<OddsChangedEvent>(ODDS_CHANGED, handler);
+  });
 });
 
 // List markets endpoint with optional filters

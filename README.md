@@ -16,10 +16,20 @@ npm start      # Run compiled JS
 | Method | Path                | Description             |
 |--------|---------------------|-------------------------|
 | GET    | `/health`           | Health check endpoint   |
+| GET    | `/events/odds`      | SSE stream for odds changes |
 | GET    | `/markets`          | List markets (with optional filters) |
 | POST   | `/markets`          | Create a new market     |
 | GET    | `/markets/:id`      | Get a market by ID      |
 | POST   | `/markets/:id/odds` | Update market odds      |
+
+### GET /events/odds
+
+Server-Sent Events stream for real-time odds change notifications.
+
+**Response:** SSE stream with `odds_changed` events:
+```
+data: {"marketId":"mkt_1","previousOdds":{"home":1.5,"away":2.5},"newOdds":{"home":1.8,"away":2.2},"updatedAt":"2026-02-01T12:00:00.000Z"}
+```
 
 ### GET /markets
 
