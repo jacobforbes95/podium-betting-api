@@ -1,6 +1,8 @@
-﻿import { describe, it, expect } from 'vitest';
-import { createMarket, getMarket, filterMarkets } from './marketStore';
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { createMarket, getMarket, filterMarkets, updateOdds } from './marketStore';
 import { Sport, MarketStatus } from '../models/market';
+import { on, off, clear } from '../events/eventBus';
+import { ODDS_CHANGED, OddsChangedEvent } from '../events/marketEvents';
 
 describe('marketStore', () => {
   it('creates a market with correct properties', () => {
@@ -56,6 +58,46 @@ describe('filterMarkets', () => {
     const filtered = filterMarkets({ sport: Sport.Tennis, status: MarketStatus.Open });
 
     expect(filtered.every(m => m.sport === Sport.Tennis && m.status === MarketStatus.Open)).toBe(true);
+  });
+});
+
+describe('updateOdds', () => {
+  beforeEach(() => {
+    clear();
+  });
+
+  it('updates odds and updatedAt', () => {
+    const market = createMarket(Sport.Football, 'evt_odds_1', { home: 1.5, away: 2.5 });
+    const originalUpdatedAt = market.updatedAt;
+
+    const updated = updateOdds(market.id, { home: 1.8, away: 2.2 });
+
+    expect(updated).toBeDefined();
+    expect(updated!.odds).toEqual({ home: 1.8, away: 2.2 });
+    expect(updated!.updatedAt.getTime()).toBeGreaterThanOrEqual(originalUpdatedAt.getTime());
+  });
+
+  it('returns undefined for non-existent market', () => {
+    const result = updateOdds('mkt_nonexistent', { home: 1.5, away: 2.5 });
+    expect(result).toBeUndefined();
+  });
+
+  it('emits odds_changed event', () => {
+    const market = createMarket(Sport.Football, 'evt_odds_2', { home: 1.5, away: 2.5 });
+    const handler = vi.fn();
+
+    on<OddsChangedEvent>(ODDS_CHANGED, handler);
+    updateOdds(market.id, { home: 1.8, away: 2.2 });
+    off<OddsChangedEvent>(ODDS_CHANGED, handler);
+
+    expect(handler).toHaveBeenCalledOnce();
+    expect(handler).toHaveBeenCalledWith(
+      expect.objectContaining({
+        marketId: market.id,
+        previousOdds: { home: 1.5, away: 2.5 },
+        newOdds: { home: 1.8, away: 2.2 },
+      })
+    );
   });
 });
 

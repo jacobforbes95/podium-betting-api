@@ -1,5 +1,5 @@
 ﻿import { describe, it, expect } from 'vitest';
-import { validateCreateMarket } from './market';
+import { validateCreateMarket, validateUpdateOdds } from './market';
 
 describe('validateCreateMarket', () => {
   it('returns no errors for valid input', () => {
@@ -63,3 +63,30 @@ describe('validateCreateMarket', () => {
     expect(errors).toContainEqual({ field: 'odds.home', message: 'Odds must be a number greater than 1' });
   });
 });
+
+describe('validateUpdateOdds', () => {
+  it('returns no errors for valid odds', () => {
+    const input = { odds: { home: 1.5, away: 2.5 } };
+    const errors = validateUpdateOdds(input);
+    expect(errors).toEqual([]);
+  });
+
+  it('returns error when odds is missing', () => {
+    const input = {} as { odds: Record<string, unknown> };
+    const errors = validateUpdateOdds(input);
+    expect(errors).toContainEqual({ field: 'odds', message: 'Odds are required' });
+  });
+
+  it('returns error when odds has fewer than 2 selections', () => {
+    const input = { odds: { home: 1.5 } };
+    const errors = validateUpdateOdds(input);
+    expect(errors).toContainEqual({ field: 'odds', message: 'At least two selections are required' });
+  });
+
+  it('returns error when odds value is not greater than 1', () => {
+    const input = { odds: { home: 0.5, away: 2.5 } };
+    const errors = validateUpdateOdds(input);
+    expect(errors).toContainEqual({ field: 'odds.home', message: 'Odds must be a number greater than 1' });
+  });
+});
+

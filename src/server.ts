@@ -1,6 +1,6 @@
 ﻿import Fastify from 'fastify';
-import { createMarket, getMarket, filterMarkets } from './store/marketStore';
-import { validateCreateMarket, CreateMarketInput } from './validation/market';
+import { createMarket, getMarket, filterMarkets, updateOdds } from './store/marketStore';
+import { validateCreateMarket, CreateMarketInput, validateUpdateOdds, UpdateOddsInput } from './validation/market';
 import { Sport, MarketStatus } from './models/market';
 
 const server = Fastify({
@@ -46,6 +46,24 @@ server.get('/markets/:id', async (request, reply) => {
   const { id } = request.params as { id: string };
   const market = getMarket(id);
 
+  if (!market) {
+    return reply.status(404).send({ error: 'Market not found' });
+  }
+
+  return market;
+});
+
+// Update market odds endpoint
+server.post('/markets/:id/odds', async (request, reply) => {
+  const { id } = request.params as { id: string };
+  const input = request.body as UpdateOddsInput;
+
+  const errors = validateUpdateOdds(input);
+  if (errors.length > 0) {
+    return reply.status(400).send({ errors });
+  }
+
+  const market = updateOdds(id, input.odds as Record<string, number>);
   if (!market) {
     return reply.status(404).send({ error: 'Market not found' });
   }

@@ -13,12 +13,13 @@ npm start      # Run compiled JS
 
 ## Endpoints
 
-| Method | Path           | Description             |
-|--------|----------------|-------------------------|
-| GET    | `/health`      | Health check endpoint   |
-| GET    | `/markets`     | List markets (with optional filters) |
-| POST   | `/markets`     | Create a new market     |
-| GET    | `/markets/:id` | Get a market by ID      |
+| Method | Path                | Description             |
+|--------|---------------------|-------------------------|
+| GET    | `/health`           | Health check endpoint   |
+| GET    | `/markets`          | List markets (with optional filters) |
+| POST   | `/markets`          | Create a new market     |
+| GET    | `/markets/:id`      | Get a market by ID      |
+| POST   | `/markets/:id/odds` | Update market odds      |
 
 ### GET /markets
 
@@ -64,6 +65,25 @@ Creates a new betting market.
 Retrieves a market by its ID.
 
 **Response:** `200 OK` with the market, or `404 Not Found` if the market does not exist.
+
+### POST /markets/:id/odds
+
+Updates the odds for a market. Emits an `odds_changed` domain event.
+
+**Request body:**
+```json
+{
+  "odds": {
+    "home": 1.8,
+    "away": 2.2
+  }
+}
+```
+
+**Validation rules:**
+- `odds`: Required. Object with at least 2 selections, each value must be > 1
+
+**Response:** `200 OK` with the updated market, `400 Bad Request` with validation errors, or `404 Not Found` if the market does not exist.
 
 ## Configuration
 

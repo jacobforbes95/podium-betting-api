@@ -6,6 +6,10 @@ export interface CreateMarketInput {
   odds: Record<string, unknown>;
 }
 
+export interface UpdateOddsInput {
+  odds: Record<string, unknown>;
+}
+
 export interface ValidationError {
   field: string;
   message: string;
@@ -43,3 +47,24 @@ export function validateCreateMarket(input: CreateMarketInput): ValidationError[
 
   return errors;
 }
+
+export function validateUpdateOdds(input: UpdateOddsInput): ValidationError[] {
+  const errors: ValidationError[] = [];
+
+  if (!input.odds || typeof input.odds !== 'object') {
+    errors.push({ field: 'odds', message: 'Odds are required' });
+  } else {
+    const selections = Object.keys(input.odds);
+    if (selections.length < 2) {
+      errors.push({ field: 'odds', message: 'At least two selections are required' });
+    }
+    for (const [selection, value] of Object.entries(input.odds)) {
+      if (typeof value !== 'number' || value <= 1) {
+        errors.push({ field: `odds.${selection}`, message: 'Odds must be a number greater than 1' });
+      }
+    }
+  }
+
+  return errors;
+}
+
