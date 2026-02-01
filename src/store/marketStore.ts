@@ -26,6 +26,22 @@ export function getMarket(id: string): Market | undefined {
   return markets.get(id);
 }
 
-export function listMarkets(): Market[] {
-  return Array.from(markets.values());
+
+export interface MarketFilters {
+  sport?: Sport;
+  status?: MarketStatus;
 }
+
+export function filterMarkets(filters: MarketFilters): Market[] {
+  let result = Array.from(markets.values());
+
+  if (filters.sport) {
+    result = result.filter(m => m.sport === filters.sport);
+  }
+  if (filters.status) {
+    result = result.filter(m => m.status === filters.status);
+  }
+
+  return result;
+}
+
