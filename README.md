@@ -121,3 +121,8 @@ Tests cover:
 - **Store** — CRUD operations and filtering logic
 - **Events** — `odds_changed` event emission on odds updates
 - **API** — Integration tests for all endpoints using supertest
+
+## AI Workflow
+
+This project was developed using AI-assisted tooling. See [AI.md](AI.md) for details on how AI was used, example prompts, and the judgement applied to generated code.
+
