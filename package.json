@@ -1,0 +1,21 @@
+{
+  "name": "podium-betting-api",
+  "version": "1.0.0",
+  "description": "Minimal Fastify betting API",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node src/server.ts"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "dependencies": {
+    "fastify": "^4.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.0"
+  }
+}
